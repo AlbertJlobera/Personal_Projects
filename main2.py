@@ -8,16 +8,15 @@ from src.SpecificProduct import infoProduct
 
 def parse():
     parser=ArgumentParser(description="Activa Pythonium")
-    parser.add_argument("--item",dest="item",type=str,help="Escribe detalladamente el producto que quieres.")
-
+    parser.add_argument("--index",dest="index",type=int,help="Selecciona el número del índice del 0 al 4.")
+    parser.add_argument("--precio",dest="precio",type=float,help="Indica el precio máximo que estás dispuesto a pagar.")
     return parser.parse_args()
 
 def main():
     args=parse()
-    item=args.item
-
-    First_step=getInformationProduct(item)   
-
+    index=args.index
+    precio=args.precio
+    Second_Step=infoProduct(index,precio)
 
 
 if __name__ == '__main__':

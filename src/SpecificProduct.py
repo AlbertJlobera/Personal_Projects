@@ -96,10 +96,10 @@ def infoProduct(index,min_price):
     df = {'Characteristics': column_1,'Information':column_2}
     df = pd.DataFrame.from_dict(df, orient='index')
     df = df.transpose()
-    # Set index to Characteristics to get just two columns in our DataFrame
-    product = df.set_index(['Characteristics'])
+    # Set index to column Characteristics
+    df = df.set_index(['Characteristics'])
     # Save csv to Email_2.csv
-    product.to_csv('Email_2.csv', index=False)
+    df.to_csv('Email_2.csv')
 
     # Get Sentiment Analizer
     
@@ -158,7 +158,7 @@ def infoProduct(index,min_price):
     )
     
     server.quit()
-    print('Hey, email has been sent!')
+    
     
     while True:
         sleep(60 * 60)

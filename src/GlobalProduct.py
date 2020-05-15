@@ -15,6 +15,11 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import mimetypes
 
 
 def getInformationProduct(search):
@@ -25,7 +30,7 @@ def getInformationProduct(search):
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--incognito") 
     # Open chrome
-    driver = webdriver.Chrome('../chromedriver',options=chrome_options)
+    driver = webdriver.Chrome('../../chromedriver',options=chrome_options)
     # Go to Amazon
     driver.get("https://www.amazon.es/")
     sleep(3)
@@ -115,14 +120,31 @@ def getInformationProduct(search):
     si no me indicas un precio estimado te avisaré cuando baje, aun que sea solo un poco :).\n\n
         Recuerda que me encontrarás en tu terminal con el comando ......\n\nTen un buen día!,\nPythonium'''
     
-    msg = f'Subject:{subject}\n\n{body}'.encode()
-    
-    
+    msg = f'Subject:{subject}\n\n{body}'.encode("utf-8")
+    # ----------------Attached---------
+    fileToSend = "Email_1.csv"
+  
+    ctype, encoding = mimetypes.guess_type(fileToSend)
+    if ctype is None or encoding is not None:
+        ctype = "application/octet-stream"
+
+    maintype, subtype = ctype.split("/", 1)
+
+    if maintype == "text":
+        fp = open(fileToSend)
+    # Note: we should handle calculating the charset
+    attachment = MIMEText(fp.read(), _subtype=subtype)
+    fp.close()
+    attachment.add_header("Content-Disposition", "attachment", filename=fileToSend)
+    msg.attach(attachment)
+    # ------------------Attached----------
     server.sendmail(
         sender_email,
         receiver_email,
-        msg
+        msg,
+        
     )
     
     server.quit()
 
+getInformationProduct('macbook air 13')
