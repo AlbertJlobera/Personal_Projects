@@ -46,7 +46,4 @@ def send_mail():
         msg
     )
     
-    print('Hey email has been sent!')
-    
     server.quit()
-send_mail()

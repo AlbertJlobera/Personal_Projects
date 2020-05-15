@@ -8,15 +8,16 @@ load_dotenv()
 # Import smtplib for email function
 import smtplib
 
-# Extract csv
-df = pd.read_csv('products_ready.csv')
-# Select Price and Item columns
-df_email = df[['Price','Item']]
-# Save csv to Email_1.csv, no index needed
-df_email.to_csv('Email_1.csv',index=False)
+
 
 def send_mail():
-
+    # Extract csv
+    df = pd.read_csv('products_ready.csv')
+    # Select Price and Item columns
+    df_email = df[['Price','Item']]
+    # Save csv to Email_1.csv, no index needed
+    df_email.to_csv('../Email_1.csv',index=False)
+    df_email = df[['Price','Item']]
     # Preparing env variables
     sender_email = os.getenv('emailP')
     receiver_email = os.getenv('email')
@@ -48,8 +49,7 @@ def send_mail():
         msg
     )
     
-    print('Hey email has been sent!')
-    
     server.quit()
-    
+
 send_mail()
+

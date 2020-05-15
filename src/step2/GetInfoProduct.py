@@ -9,13 +9,13 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 
-def infoProduct(indexnumer):
+def infoProduct(index):
     # Load csv Email_1
-    df = pd.read_csv('../../Email_1.csv')
+    df = pd.read_csv('../Email_1.csv')
     # Extract item chosen by index and save it into a new variable item_chosed
-    item_chosen = df.loc[indexnumer,'Item']
+    item_chosen = df.loc[index,'Item']
     # Extract price  of the item chosen by index and save it into a new variable item_chosed
-    price_chosen = df.loc[indexnumer,'Price']
+    price_chosen = df.loc[index,'Price']
     # Active Selenium with incognit 
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--incognito")
@@ -85,6 +85,8 @@ def infoProduct(indexnumer):
     product = df.set_index(['Characteristics'])
     # Save csv to Email_2.csv
     product.to_csv('Email_2.csv', index=False)
+    
 
-infoProduct(0)
+
+
 

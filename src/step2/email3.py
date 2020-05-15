@@ -49,4 +49,3 @@ def last_email(min_price):
         send_final_email()
 
 
-last_email(100000)

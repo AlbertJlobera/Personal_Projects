@@ -57,4 +57,4 @@ def getInformationProduct(search):
     # Save csv file as df.items.csv no new index needed.
     df.to_csv('df.items.csv',index=False)
 
-getInformationProduct('Macbook air 13')
+getInformationProduct('macbook air 13')
