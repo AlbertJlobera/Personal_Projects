@@ -108,7 +108,7 @@ def getInformationProduct(search,user,email_user):
         Seguimos en contacto,<br>
         Pythonium<br><br>
         </p>
-    <img src="pythonium.jpg">
+
     </body>
     </html>
     """
