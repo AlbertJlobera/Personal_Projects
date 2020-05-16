@@ -20,6 +20,8 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import mimetypes
+from email.mime.image import MIMEImage
+
 
 
 def getInformationProduct(search,user,email_user):
@@ -87,12 +89,12 @@ def getInformationProduct(search,user,email_user):
 
     # Preparing env variables
     sender_email = os.getenv('emailP')
-    receiver_email = email_user
+    receiver_email = os.getenv('email')
     password = os.getenv('PasswordP')
 
     msg = MIMEMultipart()
     msg["From"] = sender_email
-    msg["To"] = receiver_email
+    msg["To"] = email_user
     msg["Subject"] = "Pythonium: Lo mejor que he encontrado"
     html =f"""\
     <html>
@@ -109,7 +111,6 @@ def getInformationProduct(search,user,email_user):
         Pythonium<br><br>
         </p>
 
-    <figure class="wp-block-image size-large is-resized"><img src="https://github.com/AlbertJlobera/Personal_Projects/blob/master/IMG/pythonium.jpg" width="524" height="347"/></figure> 
     </body>
     </html>
     """
@@ -134,6 +135,10 @@ def getInformationProduct(search,user,email_user):
         attachment.set_payload(fp.read())
         fp.close()
         encoders.encode_base64(attachment)
+    fp = open('IMG/pythonium.png', 'rb')
+    img = MIMEImage(fp.read())
+    fp.close()
+    msg.attach(img)
     attachment.add_header("Content-Disposition", "attachment", filename=fileToSend)
     msg.attach(attachment)
 
@@ -141,6 +146,6 @@ def getInformationProduct(search,user,email_user):
     server.starttls()
     server.login(sender_email,password)
     server.sendmail(sender_email, receiver_email, msg.as_string())
- 
+
     server.quit()
 

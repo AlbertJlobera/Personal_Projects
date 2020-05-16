@@ -137,13 +137,13 @@ def infoProduct(index,min_price,user,email_user):
 
     # Preparing env variables
     sender_email = os.getenv('emailP')
-    receiver_email = email_user
+    receiver_email = os.getenv('email')
     password = os.getenv('PasswordP')
 
     msg = MIMEMultipart()
     msg["From"] = sender_email
-    msg["To"] = receiver_email
-    msg["Subject"] = "Pythonium: Tu producto"
+    msg["To"] = email_user
+    msg["Subject"] = "Pythonium: Lo mejor que he encontrado"
     html =f"""\
     <html>
     <head></head>
@@ -159,10 +159,9 @@ def infoProduct(index,min_price,user,email_user):
     </body>
     </html>
     """
-
     part2 = MIMEText(html, 'html')
     msg.attach(part2)
-    fileToSend = 'src/CSV/Tu-Producto.csv'
+    fileToSend = 'src/CSV/Products.csv'
     ctype, encoding = mimetypes.guess_type(fileToSend)
     if ctype is None or encoding is not None:
         ctype = "application/octet-stream"
@@ -180,6 +179,10 @@ def infoProduct(index,min_price,user,email_user):
         attachment.set_payload(fp.read())
         fp.close()
         encoders.encode_base64(attachment)
+    fp = open('IMG/pythonium.png', 'rb')
+    img = MIMEImage(fp.read())
+    fp.close()
+    msg.attach(img)
     attachment.add_header("Content-Disposition", "attachment", filename=fileToSend)
     msg.attach(attachment)
 
@@ -189,7 +192,6 @@ def infoProduct(index,min_price,user,email_user):
     server.sendmail(sender_email, receiver_email, msg.as_string())
 
     server.quit()
-
     
     
     while True:
@@ -219,9 +221,6 @@ def infoProduct(index,min_price,user,email_user):
         # Condition if the price goes down third email will be sent
         if (max_price1 <= min_price):
 
-
-
-
             msg = MIMEMultipart()
             msg["From"] = sender_email
             msg["To"] = receiver_email
@@ -236,7 +235,7 @@ def infoProduct(index,min_price,user,email_user):
             </body>
             </html>
             """
-            # Here is the <a href="https://www.python.org">link</a> you wanted. 
+ 
             part2 = MIMEText(html, 'html')
             msg.attach(part2)
             fileToSend = 'src/CSV/Tu-Producto.csv'
