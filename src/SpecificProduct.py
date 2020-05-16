@@ -6,6 +6,11 @@ from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import mimetypes
+from email import encoders
+from email.mime.base import MIMEBase
 from selenium.webdriver.support import expected_conditions as EC
 # Import googletrans to conver reviews to english language due nltk just accept english
 from googletrans import Translator
@@ -24,9 +29,9 @@ load_dotenv()
 
 
 
-def infoProduct(index,min_price):
+def infoProduct(index,min_price,user,email_user):
     # Load csv Email_1
-    df = pd.read_csv('../Email_1.csv')
+    df = pd.read_csv('src/CSV/Products.csv')
     # Extract item chosen by index and save it into a new variable item_chosed
     item_chosen = df.loc[index,'Item']
     # Extract price  of the item chosen by index and save it into a new variable item_chosed
@@ -99,7 +104,7 @@ def infoProduct(index,min_price):
     # Set index to column Characteristics
     df = df.set_index(['Characteristics'])
     # Save csv to Email_2.csv
-    df.to_csv('Email_2.csv')
+    df.to_csv('src/CSV/Tu-Producto.csv')
 
     # Get Sentiment Analizer
     
@@ -120,44 +125,71 @@ def infoProduct(index,min_price):
     # Make persantatge of the sentiment for each group
 
     sentiment_changed = {'Positivo':round(sentiment_changed['Positivo']*100/1,2),'Neutro':round(sentiment_changed['Neutro']*100/1,2),'Negativo':round(sentiment_changed['Negativo']*100/1,2)}
-
+    # Condition depending the sentiment:
+    if sentiment_changed['Positivo'] > sentiment_changed['Neutro'] and sentiment_changed['Negativo']:
+        sentiment_compared= 'El sentimiento positivo es superior a los demás, estamos hablando de un producto escepcional segun los clientes!'
+    elif sentiment_changed['Negativo'] > sentiment_changed['Neutro'] and sentiment_changed['Negativo']:
+        sentiment_compared='El sentimiento negativo es superior a los demás, miratelo bien antes de comprarlo...'
+    else:
+        sentiment_compared = 'El sentimiento neutro es superior a los demás, yo no me preocuparia, aun así informate bien.'
     # Send second Email
+# Send email with csv atatched
 
-    product = pd.read_csv('Email_2.csv')
     # Preparing env variables
     sender_email = os.getenv('emailP')
-    receiver_email = os.getenv('email')
+    receiver_email = email_user
     password = os.getenv('PasswordP')
 
-    # Connecting to the server
-    server = smtplib.SMTP('smtp.gmail.com',587)
-    server.ehlo()
-    server.starttls()
-    server.ehlo()
-    
-    server.login(sender_email,password)
-    # Subject of the email
-    subject = 'Pythonium, detalles del artículo'
-    # Body of the email
-    body = f'''Buenos días!\n\nVoy a recordarte el nombre y especificaciones generales del producto escogido: 
-    \n{Item}\nPrecio actual: {max_price}.\n\n
-    Segun mi sistema de sentimiento, las valoraciones tienen un % de:\n
-    {sentiment_changed}\n\n\nEnlace al producto:\n {url}
-    
-    Te adjunto una tabla con los datos técnicos del producto para que le eches un ojo:\n\n\n{product}\n\n 
-    Cuando baje al precio deseado te lo recordaré.\n\n Ten un buen día!,\n Pythonium,'''
+    msg = MIMEMultipart()
+    msg["From"] = sender_email
+    msg["To"] = receiver_email
+    msg["Subject"] = "Pythonium: Tu producto"
+    html =f"""\
+    <html>
+    <head></head>
+    <body>
+        <h3>Hola, {user} ¡Soy yo de nuevo!</h3><br><br>
+    <p>Voy a recordarte el nombre y especificaciones generales del producto escogido: 
+    <br><br><strong>{Item}€</strong><br><br><i>Precio actual:</i> <strong>{price}€</strong>.<br><br><i>Precio acordado:</i> <strong>{min_price}</strong><br><br>
+    He leido todas als valoraciones y he calculado el porcentaje del sentimiento:<br>{sentiment_changed}<br><br>{sentiment_compared}<br><br>
+    Te he adjuntado una tabla con los <strong>datos técnicos</strong> del producto para que le eches un ojo.<br>
+     <a href="{url}">Aquí</a>   puedes ver más información acerca de tu producto.<br>
+    Cuando baje al precio deseado te lo recordaré.<br><br> Ten un buen día!,<br> Pythonium,
+        </p>
+    </body>
+    </html>
+    """
 
-    
-    msg = f'Subject:{subject}\n\n{body}'.encode()
-    
-    
-    server.sendmail(
-        sender_email,
-        receiver_email,
-        msg
-    )
-    
+    part2 = MIMEText(html, 'html')
+    msg.attach(part2)
+    fileToSend = 'src/CSV/Tu-Producto.csv'
+    ctype, encoding = mimetypes.guess_type(fileToSend)
+    if ctype is None or encoding is not None:
+        ctype = "application/octet-stream"
+
+    maintype, subtype = ctype.split("/", 1)
+
+    if maintype == "html":
+        fp = open(fileToSend)
+        # Note: we should handle calculating the charset
+        attachment = MIMEText(fp.read(), _subtype=subtype)
+        fp.close()
+    else:
+        fp = open(fileToSend, "rb")
+        attachment = MIMEBase(maintype, subtype)
+        attachment.set_payload(fp.read())
+        fp.close()
+        encoders.encode_base64(attachment)
+    attachment.add_header("Content-Disposition", "attachment", filename=fileToSend)
+    msg.attach(attachment)
+
+    server = smtplib.SMTP("smtp.gmail.com:587")
+    server.starttls()
+    server.login(sender_email,password)
+    server.sendmail(sender_email, receiver_email, msg.as_string())
+
     server.quit()
+
     
     
     while True:
@@ -188,37 +220,51 @@ def infoProduct(index,min_price):
         if (max_price1 <= min_price):
 
 
-            # Send third email
-
-            sender_email = os.getenv('emailP')
-            receiver_email = os.getenv('email')
-            password = os.getenv('PasswordP')
 
 
-            server = smtplib.SMTP('smtp.gmail.com',587)
-            server.ehlo()
+            msg = MIMEMultipart()
+            msg["From"] = sender_email
+            msg["To"] = receiver_email
+            msg["Subject"] = "Pythonium: ¡Tenemos una oferta!"
+            html =f"""\
+            <html>
+            <head></head>
+            <body>
+             <h2>{user}</h2>
+                <h3>¡El precio ha bajado!</h3>
+                 <a href="{url}">A por él!</a>
+            </body>
+            </html>
+            """
+            # Here is the <a href="https://www.python.org">link</a> you wanted. 
+            part2 = MIMEText(html, 'html')
+            msg.attach(part2)
+            fileToSend = 'src/CSV/Tu-Producto.csv'
+            ctype, encoding = mimetypes.guess_type(fileToSend)
+            if ctype is None or encoding is not None:
+                ctype = "application/octet-stream"
+
+            maintype, subtype = ctype.split("/", 1)
+
+            if maintype == "html":
+                fp = open(fileToSend)
+                # Note: we should handle calculating the charset
+                attachment = MIMEText(fp.read(), _subtype=subtype)
+                fp.close()
+            else:
+                fp = open(fileToSend, "rb")
+                attachment = MIMEBase(maintype, subtype)
+                attachment.set_payload(fp.read())
+                fp.close()
+                encoders.encode_base64(attachment)
+            attachment.add_header("Content-Disposition", "attachment", filename=fileToSend)
+            msg.attach(attachment)
+
+            server = smtplib.SMTP("smtp.gmail.com:587")
             server.starttls()
-            server.ehlo()
-            
             server.login(sender_email,password)
-            
-            subject = 'Pythonium, ¡Tienes una oferta!'
-            
-            body = f'''Buenas noticias!\n\nNuestro producto\n {Item}\n\n Se encuentra al siguiente precio {max_price1}!  
-            si aun sigues interesado te dejo el enlace:\n\n {url}.\n\n\n Ten un buen día!,\n Pythonium,'''
+            server.sendmail(sender_email, receiver_email, msg.as_string())
 
-            
-            msg = f'Subject:{subject}\n\n{body}'.encode()
-            
-            
-            server.sendmail(
-                sender_email,
-                receiver_email,
-                msg
-            )
-            
-            print('Hey email has been sent!')
-            
             server.quit()
 
 

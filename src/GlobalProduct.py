@@ -22,7 +22,7 @@ from email.mime.text import MIMEText
 import mimetypes
 
 
-def getInformationProduct(search):
+def getInformationProduct(search,user,email_user):
 
     # Using Selenium
 
@@ -30,7 +30,7 @@ def getInformationProduct(search):
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--incognito") 
     # Open chrome
-    driver = webdriver.Chrome('../../chromedriver',options=chrome_options)
+    driver = webdriver.Chrome('../chromedriver',options=chrome_options)
     # Go to Amazon
     driver.get("https://www.amazon.es/")
     sleep(3)
@@ -71,80 +71,75 @@ def getInformationProduct(search):
     df = {'Item':Items,'Price':Price}
     df = pd.DataFrame.from_dict(df, orient='index')
     df = df.transpose()
-    # Save csv file as df.items.csv no new index needed.
-    df.to_csv('df.items.csv',index=False)
-
-    # Cleaning Dataset:
-
-    # Load csv as df
-    df = pd.read_csv('df.items.csv')
     # Drop nulls
     df.dropna(inplace=True)
+
     # Sort values by Price max to min to extract the fifth expensive products
     df.sort_values(by=['Price'], ascending=False,inplace=True)
     # Reset index
     df.reset_index(drop=True,inplace=True)
     # Create a new DataFrame with the fifth first products as five_products
-    five_products = df.head(5)
-    # Save CSV as products_ready.csv no index
-    five_products.to_csv('products_ready.csv',index=False)
+    df = df.head(5)
+    # Save csv as Products to attach in the next email
+    df.to_csv('src/CSV/Products.csv')
 
-    # Sending first email:
+    # Send email with csv atatched
 
-    # Extract csv
-    df = pd.read_csv('products_ready.csv')
-    # Select Price and Item columns
-    df_email = df[['Price','Item']]
-    # Save csv to Email_1.csv, no index needed
-    df_email.to_csv('../Email_1.csv',index=False)
-    df_email = df[['Price','Item']]
     # Preparing env variables
     sender_email = os.getenv('emailP')
-    receiver_email = os.getenv('email')
+    receiver_email = email_user
     password = os.getenv('PasswordP')
 
-    # Connecting to the server
-    server = smtplib.SMTP('smtp.gmail.com',587)
-    server.ehlo()
-    server.starttls()
-    server.ehlo()
+    msg = MIMEMultipart()
+    msg["From"] = sender_email
+    msg["To"] = receiver_email
+    msg["Subject"] = "Pythonium: Lo mejor que he encontrado"
+    html =f"""\
+    <html>
+    <head></head>
+    <body>
+        <h3>¡Hola, {user}!</h3>
+        <p>Muchas garcias por encargarme mi primera misión, he estado investigando por Amazon sobre: {search}<br>
+        De todos lo que he visto, he seleccionado los 5 mejores y te los adjunto en este email.<br>
+        Acuérdate de indicarme el número del artículo que más te guste, y del precio que estarías interesado.<p>
+       
+
+        
+        Seguimos en contacto,<br>
+        Pythonium<br><br>
+        </p>
+    <img src="pythonium.jpg">
+    </body>
+    </html>
+    """
     
-    server.login(sender_email,password)
-    # Subject of the email 
-    subject = 'Soy Pythonium, encantado de conocerte'
-    # Body of the email
-    body = f'''Buenos día,\nAquí tienes el producto que me pediste, 
-    te mando una lista de los cinco productos más caros que he econtrado.
-    \nDime cual quieres indicando el número que te aparece delante de cada artículo, van del 0 al 4, 
-    necesitaría tambien el precio al cual estarías interesado.\n\n\n{df_email}\n\n\n Te avisaré cuando el precio baje, 
-    si no me indicas un precio estimado te avisaré cuando baje, aun que sea solo un poco :).\n\n
-        Recuerda que me encontrarás en tu terminal con el comando ......\n\nTen un buen día!,\nPythonium'''
-    
-    msg = f'Subject:{subject}\n\n{body}'.encode("utf-8")
-    # ----------------Attached---------
-    fileToSend = "Email_1.csv"
-  
+    part2 = MIMEText(html, 'html')
+    msg.attach(part2)
+    fileToSend = 'src/CSV/Products.csv'
     ctype, encoding = mimetypes.guess_type(fileToSend)
     if ctype is None or encoding is not None:
         ctype = "application/octet-stream"
 
     maintype, subtype = ctype.split("/", 1)
 
-    if maintype == "text":
+    if maintype == "html":
         fp = open(fileToSend)
-    # Note: we should handle calculating the charset
-    attachment = MIMEText(fp.read(), _subtype=subtype)
-    fp.close()
+        # Note: we should handle calculating the charset
+        attachment = MIMEText(fp.read(), _subtype=subtype)
+        fp.close()
+    else:
+        fp = open(fileToSend, "rb")
+        attachment = MIMEBase(maintype, subtype)
+        attachment.set_payload(fp.read())
+        fp.close()
+        encoders.encode_base64(attachment)
     attachment.add_header("Content-Disposition", "attachment", filename=fileToSend)
     msg.attach(attachment)
-    # ------------------Attached----------
-    server.sendmail(
-        sender_email,
-        receiver_email,
-        msg,
-        
-    )
-    
+
+    server = smtplib.SMTP("smtp.gmail.com:587")
+    server.starttls()
+    server.login(sender_email,password)
+    server.sendmail(sender_email, receiver_email, msg.as_string())
+ 
     server.quit()
 
-getInformationProduct('macbook air 13')
