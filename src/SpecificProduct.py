@@ -9,6 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import mimetypes
+from email.mime.image import MIMEImage
 from email import encoders
 from email.mime.base import MIMEBase
 from selenium.webdriver.support import expected_conditions as EC
@@ -127,41 +128,42 @@ def infoProduct(index,min_price,user,email_user):
     sentiment_changed = {'Positivo':round(sentiment_changed['Positivo']*100/1,2),'Neutro':round(sentiment_changed['Neutro']*100/1,2),'Negativo':round(sentiment_changed['Negativo']*100/1,2)}
     # Condition depending the sentiment:
     if sentiment_changed['Positivo'] > sentiment_changed['Neutro'] and sentiment_changed['Negativo']:
-        sentiment_compared= 'El sentimiento positivo es superior a los demás, estamos hablando de un producto escepcional segun los clientes!'
+        sentiment_compared= 'El sentimiento positivo es superior a los demás, por lo que este producto es exepcional según los clientes.'
     elif sentiment_changed['Negativo'] > sentiment_changed['Neutro'] and sentiment_changed['Negativo']:
-        sentiment_compared='El sentimiento negativo es superior a los demás, miratelo bien antes de comprarlo...'
+        sentiment_compared='El sentimiento negativo es superior a los demás, quizá sería mejor que buscases otras opciones antes de comprarlo.'
     else:
-        sentiment_compared = 'El sentimiento neutro es superior a los demás, yo no me preocuparia, aun así informate bien.'
+        sentiment_compared = 'El sentimiento neutro es superior a los demás, así que no te preocupes. De todas formas, infórmate bien.'
     # Send second Email
 # Send email with csv atatched
 
     # Preparing env variables
     sender_email = os.getenv('emailP')
-    receiver_email = os.getenv('email')
+    receiver_email = email_user
     password = os.getenv('PasswordP')
 
     msg = MIMEMultipart()
     msg["From"] = sender_email
     msg["To"] = email_user
-    msg["Subject"] = "Pythonium: Lo mejor que he encontrado"
+    msg["Subject"] = f"Pythonium: Tu TOP 1"
     html =f"""\
-    <html>
+    <html>          
     <head></head>
     <body>
-        <h3>Hola, {user} ¡Soy yo de nuevo!</h3><br><br>
-    <p>Voy a recordarte el nombre y especificaciones generales del producto escogido: 
-    <br><br><strong>{Item}€</strong><br><br><i>Precio actual:</i> <strong>{price}€</strong>.<br><br><i>Precio acordado:</i> <strong>{min_price}</strong><br><br>
-    He leido todas als valoraciones y he calculado el porcentaje del sentimiento:<br>{sentiment_changed}<br><br>{sentiment_compared}<br><br>
-    Te he adjuntado una tabla con los <strong>datos técnicos</strong> del producto para que le eches un ojo.<br>
+        <h3>Hola, {user}... ¡Soy yo de nuevo!</h3><br>
+    <p>Te recuerdo el nombre y las características generales del producto elegido: 
+    <br><br><strong>{Item}</strong><br><br><i>Precio actual:</i> <strong><span style="color: #c82424">{price}€</span> </strong><br><br><i>Precio acordado:</i> <strong><span style="color: #4bd844">{min_price}€</span></strong><br><br>
+    He leído todas las valoraciones de los usuarios y he calculado el porcentaje de sentimiento para saber cuál ha sido su experiencia:<br><br>{sentiment_changed}<br><br>{sentiment_compared}<br><br>
+    Te adjunto una tabla con los <strong>datos técnicos</strong> del producto para que les eches un ojo.<br>
      <a href="{url}">Aquí</a>   puedes ver más información acerca de tu producto.<br>
-    Cuando baje al precio deseado te lo recordaré.<br><br> Ten un buen día!,<br> Pythonium,
+    <h3> Cuando el precio baje al acordado, te mandaré un email.</h3> <br><br>
+    ¡Espero escribirte con un <strong><span style="color: #c82424">ofertón</span></strong> muy pronto!<br><h3><span style="color: #2c32af">Pythonium</span></h3>
         </p>
     </body>
     </html>
     """
     part2 = MIMEText(html, 'html')
     msg.attach(part2)
-    fileToSend = 'src/CSV/Products.csv'
+    fileToSend = 'src/CSV/Tu-Producto.csv'
     ctype, encoding = mimetypes.guess_type(fileToSend)
     if ctype is None or encoding is not None:
         ctype = "application/octet-stream"

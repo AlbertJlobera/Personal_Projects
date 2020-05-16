@@ -89,26 +89,25 @@ def getInformationProduct(search,user,email_user):
 
     # Preparing env variables
     sender_email = os.getenv('emailP')
-    receiver_email = os.getenv('email')
+    receiver_email = email_user
     password = os.getenv('PasswordP')
 
     msg = MIMEMultipart()
     msg["From"] = sender_email
     msg["To"] = email_user
-    msg["Subject"] = "Pythonium: Lo mejor que he encontrado"
+    msg["Subject"] = f"Pythonium: Tus TOP 5 [{search}]"
     html =f"""\
     <html>
     <head></head>
     <body>
         <h3>¡Hola, {user}!</h3>
-        <p>Muchas garcias por encargarme mi primera misión, he estado investigando por Amazon sobre: {search}<br>
-        De todos lo que he visto, he seleccionado los 5 mejores y te los adjunto en este email.<br>
-        Acuérdate de indicarme el número del artículo que más te guste, y del precio que estarías interesado.<p>
-       
-
+        <p>¡Muchas gracias por encargarme mi primera misión!<br> 
+        He estado investigando en <i>Amazon</i> sobre: <strong><span style="color: #2c32af">{search}</span></strong><br>
+        Después de una búsqueda exhaustiva, he seleccionado<strong> los 5 mejores</strong> y te los adjunto en este email.<br>
+        Recuerda indicarme el <strong>número del artículo</strong> que más te guste y el <strong>precio máximo</strong> que pagarías por él.<p><br><br>
+        Seguimos en contacto,<br><br>
         
-        Seguimos en contacto,<br>
-        Pythonium<br><br>
+        <h3><span style="color: #2c32af">Pythonium</span></h3>
         </p>
 
     </body>
