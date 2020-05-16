@@ -109,6 +109,7 @@ def getInformationProduct(search,user,email_user):
         Pythonium<br><br>
         </p>
 
+    <figure class="wp-block-image size-large is-resized"><img src="https://github.com/AlbertJlobera/Personal_Projects/blob/master/IMG/pythonium.jpg" width="524" height="347"/></figure> 
     </body>
     </html>
     """
