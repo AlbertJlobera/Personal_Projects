@@ -67,21 +67,24 @@ def infoProduct(index,min_price,user,email_user):
     driver.find_element_by_class_name('a-expander-prompt')\
         .click()
     sleep(2)
-    # Start Scraping information from there
-    # Get reviews
+    try:
+        # Start Scraping information from there
+        # Get reviews
+        review = driver.find_elements_by_class_name('cr-original-review-content')# reviews to do the nltk
+        # Get item_description
+        item_description = driver.find_element_by_id('productTitle') # full description of the item
+        # Get Price
+        price = driver.find_element_by_id('priceblock_ourprice') # Actual price
+        # Get table information column one
+        column1 = driver.find_elements_by_class_name('label')
+        # Get table information column two
+        column2 = driver.find_elements_by_class_name('value')
+        # Save url
+        url = driver.current_url
+        
+    except:
+        print('Element not found')
     
-    review = driver.find_elements_by_class_name('cr-original-review-content')# reviews to do the nltk
-    # Get item_description
-    item_description = driver.find_element_by_id('productTitle') # full description of the item
-    # Get Price
-    price = driver.find_element_by_id('priceblock_ourprice') # Actual price
-    # Get table information column one
-    column1 = driver.find_elements_by_class_name('label')
-    # Get table information column two
-    column2 = driver.find_elements_by_class_name('value')
-    # Save url
-    
-    url = driver.current_url
 
     # Preparing data from Selenium to str or float.
     # Get str item description
@@ -233,7 +236,7 @@ def infoProduct(index,min_price,user,email_user):
             <body>
              <h2>{user}</h2>
                 <h3>¡El precio ha bajado!</h3>
-                 <a href="{url}">A por él!</a>
+                 <a href="{url}">A por él!</a>  
             </body>
             </html>
             """

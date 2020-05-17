@@ -51,16 +51,17 @@ def getInformationProduct(search,user,email_user):
         .click()
     sleep(2)
     # Start scraping information from there:
-
-    # Get all items name:
-    item = driver.find_elements_by_class_name("a-size-base-plus.a-color-base.a-text-normal")
-    # Get all prices:
-    price = driver.find_elements_by_class_name("a-price-whole")
-    # Get all images:
-    image = driver.find_elements_by_class_name('s-image')
-    # Save current url in url variable:
-    url = driver.current_url
-
+    try: 
+        # Get all items name:
+        item = driver.find_elements_by_class_name("a-size-base-plus.a-color-base.a-text-normal")
+        # Get all prices:
+        price = driver.find_elements_by_class_name("a-price-whole")
+        # Get all images:
+        image = driver.find_elements_by_class_name('s-image')
+        # Save current url in url variable:
+        url = driver.current_url
+    except:
+        print('Element not found')
     # Scraping.
     # Items:
     Items=[items.text for items in item]
