@@ -26,9 +26,9 @@ Pythonium nace con el propósito de ahorrarte tiempo y avisarte cuando <strong>e
     
 
 <strong>Ejemplo del primer email y el csv adjunto:</strong> <br>
-  <figure class="wp-block-image size-large is-resized"><img src="https://github.com/AlbertJlobera/Personal_Projects/blob/master/IMG/primer_email_texto.png" alt="" width="521" height="346"/></figure> <br>
+  <figure class="wp-block-image size-large is-resized"><img src="https://github.com/AlbertJlobera/Personal_Projects/blob/master/IMG/primer_email_texto.png" alt="" width="721" height="550"/></figure> <br>
   
-   <figure class="wp-block-image size-large is-resized"><img src="https://github.com/AlbertJlobera/Personal_Projects/blob/master/IMG/Primer_csv.png" alt="" width="521" height="346"/></figure> <br><br>
+   <figure class="wp-block-image size-large is-resized"><img src="https://github.com/AlbertJlobera/Personal_Projects/blob/master/IMG/Primer_csv.png" alt="" width="1000" height="446"/></figure> <br><br>
   
   <strong>Segundo Pipeline:</strong> <i>main2.py</i><br>
   En este archivo tendrás que indicarle a Pythonium el número del índice del producto (lo verás en el archivo adjunto), el precio máximo que pagarías por él, tu nombre y un email de contacto.
@@ -36,10 +36,10 @@ Pythonium nace con el propósito de ahorrarte tiempo y avisarte cuando <strong>e
   <i><strong>python3 main2.py --index</strong> <'numero del producto deseado del 0 al 4'><strong> --precio</strong> <'precio mínimo interesado'><strong> --user</strong> <'tu nombre'><strong> --email</strong> <'tu email'> </i><br>Pythonium te enviará un tercer email cuando el precio baje, y no hará falta hacer uso de otro parámetro, ya que automáticamente se formulará con una condición.<br><br>
       
       
- <strong>Ejemplo del segundo email y el csv adjunto:</strong> <br>
-  <figure class="wp-block-image size-large is-resized"><img src="https://github.com/AlbertJlobera/Personal_Projects/blob/master/IMG/Segundo_email_texto.png" alt="" width="521" height="346"/></figure> <br>
+ <strong>Ejemplo del segundo email y el csv adjunto:</strong> <br><br>
+  <figure class="wp-block-image size-large is-resized"><img src="https://github.com/AlbertJlobera/Personal_Projects/blob/master/IMG/segundo_email_text.png" alt="" width="721" height="550"/></figure> <br>
   
-   <figure class="wp-block-image size-large is-resized"><img src="https://github.com/AlbertJlobera/Personal_Projects/blob/master/IMG/Segundo%20csv.png" alt="" width="521" height="346"/></figure> <br><br>     
+   <figure class="wp-block-image size-large is-resized"><img src="https://github.com/AlbertJlobera/Personal_Projects/blob/master/IMG/Segundo%20csv.png" alt="" width="721" height="546"/></figure> <br><br>     
       
       
     Si tienes cualquier duda puedes revisar los parámetros con -h o --help, te recordará los comandos a seguir y su función.<br><br>
